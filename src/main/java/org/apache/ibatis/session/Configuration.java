@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2018 the original author or authors.
+ *    Copyright 2009-2019 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -114,8 +114,8 @@ public class Configuration {
   protected boolean returnInstanceForEmptyRow;
 
   protected String logPrefix;
-  protected Class <? extends Log> logImpl;
-  protected Class <? extends VFS> vfsImpl;
+  protected Class<? extends Log> logImpl;
+  protected Class<? extends VFS> vfsImpl;
   protected LocalCacheScope localCacheScope = LocalCacheScope.SESSION;
   protected JdbcType jdbcTypeForNull = JdbcType.OTHER;
   protected Set<String> lazyLoadTriggerMethods = new HashSet<>(Arrays.asList("equals", "clone", "hashCode", "toString"));
@@ -491,11 +491,11 @@ public class Configuration {
   }
 
   public ReflectorFactory getReflectorFactory() {
-	  return reflectorFactory;
+    return reflectorFactory;
   }
 
   public void setReflectorFactory(ReflectorFactory reflectorFactory) {
-	  this.reflectorFactory = reflectorFactory;
+    this.reflectorFactory = reflectorFactory;
   }
 
   public ObjectFactory getObjectFactory() {
@@ -536,7 +536,20 @@ public class Configuration {
     return languageRegistry.getDefaultDriver();
   }
 
-  /** @deprecated Use {@link #getDefaultScriptingLanguageInstance()} */
+  /**
+   * @since 3.5.1
+   */
+  public LanguageDriver getLanguageDriver(Class<? extends LanguageDriver> langClass) {
+    if (langClass == null) {
+      return languageRegistry.getDefaultDriver();
+    }
+    languageRegistry.register(langClass);
+    return languageRegistry.getDriver(langClass);
+  }
+
+  /**
+   * @deprecated Use {@link #getDefaultScriptingLanguageInstance()}
+   */
   @Deprecated
   public LanguageDriver getDefaultScriptingLanuageInstance() {
     return getDefaultScriptingLanguageInstance();
@@ -820,13 +833,13 @@ public class Configuration {
         }
       } while (resolved);
       if (!incompleteResultMaps.isEmpty() && ex != null) {
-        // At least one result map is unresolvable. 
+        // At least one result map is unresolvable.
         throw ex;
       }
     }
   }
 
-  /*
+  /**
    * Extracts namespace from fully qualified statement id.
    *
    * @param statementId
@@ -939,11 +952,6 @@ public class Configuration {
       return value;
     }
 
-    private String getShortName(String key) {
-      final String[] keyParts = key.split("\\.");
-      return keyParts[keyParts.length - 1];
-    }
-
     protected static class Ambiguity {
       final private String subject;
 
@@ -954,6 +962,11 @@ public class Configuration {
       public String getSubject() {
         return subject;
       }
+    }
+
+    private String getShortName(String key) {
+      final String[] keyParts = key.split("\\.");
+      return keyParts[keyParts.length - 1];
     }
   }
 
